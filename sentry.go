@@ -114,6 +114,7 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 
 	isStack := false
 	var errExept sentry.Exception
+	payload := make(map[string]string)
 
 	err := jsonparser.ObjectEach(data, func(key, value []byte, vt jsonparser.ValueType, offset int) error {
 		switch string(key) {
@@ -139,12 +140,15 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 			})
 			isStack = true
 		default:
-			event.Contexts["additional_data."+string(key)] = bytesToStrUnsafe(value)
+			payload[string(key)] = bytesToStrUnsafe(value)
 		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
+	}
+	if len(payload) != 0{
+		event.Contexts["payload"] = payload
 	}
 	if !isStack && errExept.Value != "" {
 		event.Exception = append(event.Exception, errExept)
