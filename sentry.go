@@ -109,6 +109,7 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 		Timestamp: time.Now().UTC(),
 		Level:     level,
 		Logger:    "github.com/rs/zerolog",
+		Contexts:  make(map[string]interface{}),
 	}
 
 	isStack := false
