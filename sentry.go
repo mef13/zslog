@@ -141,7 +141,7 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 	if err != nil {
 		return nil, err
 	}
-	if !isStack {
+	if !isStack && errExept.Value != "" {
 		event.Exception = append(event.Exception, errExept)
 	}
 
