@@ -19,7 +19,6 @@ func main() {
         zslog.File("/var/log/myapp/err.log", fileConf, zslog.NewLevels().SetMinLevel(zslog.ErrorLevel)),
         zslog.Sentry(zslog.SentryConfig{
             Dsn:              "https://public@sentry.example.com/1",
-            AttachStacktrace: true,
             Release:          "0.0",
         }, 3*time.Second, zslog.NewLevels().SetMinLevel(zslog.ErrorLevel)))
 
