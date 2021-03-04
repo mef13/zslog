@@ -1,0 +1,32 @@
+!.gitkeep
+.idea/
+.build/
+.gocache/
+conf/
+logs/
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Misc
+.DS_Store
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependencies
+vendor/
+
+# Benchmark and profiling files
+*.png
+profile.*
+
+# Databases
+*.db
