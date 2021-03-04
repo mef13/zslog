@@ -116,6 +116,8 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 
 	err := jsonparser.ObjectEach(data, func(key, value []byte, vt jsonparser.ValueType, offset int) error {
 		switch string(key) {
+		case zerolog.LevelFieldName, zerolog.TimestampFieldName:
+			break
 		case zerolog.MessageFieldName:
 			event.Message = bytesToStrUnsafe(value)
 		case zerolog.ErrorFieldName:
@@ -135,6 +137,8 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 				Stacktrace: e.Stacktrace,
 			})
 			isStack = true
+		default:
+			event.Contexts["additional_data."+string(key)] = bytesToStrUnsafe(value)
 		}
 		return nil
 	})
