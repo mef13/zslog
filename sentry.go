@@ -3,12 +3,13 @@ package zslog
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/buger/jsonparser"
-	"github.com/getsentry/sentry-go"
-	"github.com/rs/zerolog"
 	"reflect"
 	"time"
 	"unsafe"
+
+	"github.com/buger/jsonparser"
+	"github.com/getsentry/sentry-go"
+	"github.com/rs/zerolog"
 )
 
 var levelsMapping = map[zerolog.Level]sentry.Level{

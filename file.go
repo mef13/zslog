@@ -1,10 +1,11 @@
 package zslog
 
 import (
-	"github.com/rs/zerolog"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 	"path/filepath"
+
+	"github.com/rs/zerolog"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type FileConfig struct {

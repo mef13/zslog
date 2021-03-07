@@ -1,11 +1,12 @@
 package zslog
 
 import (
+	"io"
+	"os"
+
 	"github.com/getsentry/sentry-go"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	"io"
-	"os"
 )
 
 const (
