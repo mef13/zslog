@@ -30,7 +30,7 @@ type SentryWriter struct {
 	flushTimeout time.Duration
 }
 
-func Sentry(sentryConf SentryConfig, flushTimeout time.Duration, lvls levels) zerolog.LevelWriter {
+func getSentryWriter(sentryConf SentryConfig, flushTimeout time.Duration, lvls levels) (*SentryWriter, error) {
 	client, err := sentry.NewClient(sentry.ClientOptions{
 		Dsn:              sentryConf.Dsn,
 		Debug:            sentryConf.Debug,
@@ -56,7 +56,7 @@ func Sentry(sentryConf SentryConfig, flushTimeout time.Duration, lvls levels) ze
 		CaCerts:          sentryConf.CaCerts,
 	})
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	levels := make(map[zerolog.Level]sentry.Level, len(lvls))
@@ -76,7 +76,26 @@ func Sentry(sentryConf SentryConfig, flushTimeout time.Duration, lvls levels) ze
 		client:       client,
 		levels:       levels,
 		flushTimeout: timeout,
+	}, nil
+}
+
+//Sentry creates and return zerolog.LevelWriter interface.
+//Configured by SentryConfig(heir sentry.ClientOptions).
+func Sentry(sentryConf SentryConfig, flushTimeout time.Duration, lvls levels) zerolog.LevelWriter {
+	w, _ := getSentryWriter(sentryConf, flushTimeout, lvls)
+	return w
+}
+
+//SentryWithHub creates and return zerolog.LevelWriter interface.
+//Unlike Sentry() it also adds a sentry.Client to the sentry.Hub(like sentry.Init).
+func SentryWithHub(sentryConf SentryConfig, flushTimeout time.Duration, lvls levels) zerolog.LevelWriter {
+	w, err := getSentryWriter(sentryConf, flushTimeout, lvls)
+	if err != nil {
+		return nil
 	}
+	hub := sentry.CurrentHub()
+	hub.BindClient(w.client)
+	return w
 }
 
 func (sw *SentryWriter) Write(p []byte) (n int, err error) {
