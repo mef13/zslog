@@ -132,7 +132,16 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 			var e errWithStackTrace
 			err := json.Unmarshal(value, &e)
 			if err != nil {
-				fmt.Println("Error unmarshal: ", err)
+				e := sentry.Event{
+					Timestamp: time.Now().UTC(),
+					Level:     sentry.LevelError,
+					Contexts:  make(map[string]interface{}),
+				}
+				e.Exception = append(event.Exception, sentry.Exception{
+					Value:      err.Error(),
+					Stacktrace: sentry.ExtractStacktrace(err),
+				})
+				e.Message = fmt.Sprintf("Error unmarshal: %s", value)
 				break
 			}
 			event.Exception = append(event.Exception, sentry.Exception{
@@ -148,7 +157,7 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 	if err != nil {
 		return nil, err
 	}
-	if len(payload) != 0{
+	if len(payload) != 0 {
 		event.Contexts["payload"] = payload
 	}
 	if !isStack && errExept.Value != "" {
