@@ -33,6 +33,7 @@ const (
 type zlog struct {
 	zerolog.Logger
 	closers []io.Closer
+	noSentryWriters zerolog.LevelWriter
 }
 
 var logger zlog
@@ -125,18 +126,23 @@ func StdErr(l levels) zerolog.LevelWriter {
 func InitLogger(writers ...zerolog.LevelWriter) {
 	var closers []io.Closer
 	lwriters := zerolog.MultiLevelWriter()
+	slwriters := zerolog.MultiLevelWriter()
 	for _, w := range writers {
 		if w != nil {
 			lwriters = zerolog.MultiLevelWriter(lwriters, w)
 			if c, ok := w.(io.Closer); ok {
 				closers = append(closers, c)
 			}
+			if sw, ok := w.(*SentryWriter); !ok {
+				slwriters = zerolog.MultiLevelWriter(slwriters, sw)
+			}
 		}
 	}
 
 	logger = zlog{
-		Logger:  zerolog.New(lwriters).With().Timestamp().Logger(),
-		closers: closers,
+		Logger:          zerolog.New(lwriters).With().Timestamp().Logger(),
+		closers:         closers,
+		noSentryWriters: slwriters,
 	}
 	zerolog.ErrorStackMarshaler = func(err error) interface{} {
 		es := errWithStackTrace{
@@ -191,4 +197,8 @@ func Close() {
 	for _, c := range logger.closers {
 		c.Close()
 	}
+}
+
+func SkipSentry() zerolog.Logger {
+	return logger.Output(logger.noSentryWriters)
 }
