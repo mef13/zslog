@@ -133,8 +133,8 @@ func InitLogger(writers ...zerolog.LevelWriter) {
 			if c, ok := w.(io.Closer); ok {
 				closers = append(closers, c)
 			}
-			if sw, ok := w.(*SentryWriter); !ok {
-				slwriters = zerolog.MultiLevelWriter(slwriters, sw)
+			if _, ok := w.(*SentryWriter); !ok {
+				slwriters = zerolog.MultiLevelWriter(slwriters, w)
 			}
 		}
 	}
@@ -199,8 +199,7 @@ func Close() {
 	}
 }
 
-func SkipSentry() *zlog {
-	l := logger
-	l.Logger = logger.Output(logger.noSentryWriters)
+func SkipSentry() *zerolog.Logger {
+	l := logger.Output(logger.noSentryWriters)
 	return &l
 }
