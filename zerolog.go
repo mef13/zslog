@@ -199,6 +199,8 @@ func Close() {
 	}
 }
 
-func SkipSentry() zerolog.Logger {
-	return logger.Output(logger.noSentryWriters)
+func SkipSentry() *zlog {
+	l := logger
+	l.Logger = logger.Output(logger.noSentryWriters)
+	return &l
 }
