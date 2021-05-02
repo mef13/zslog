@@ -1,6 +1,7 @@
-[![reportcard-img]][reportcard-url]
-
 # zslog
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/mef13/zslog)](https://goreportcard.com/report/github.com/mef13/zslog)
+
 Simply configuring [zerolog](https://github.com/rs/zerolog) with output to console, [lumberjack.v2](https://github.com/natefinch/lumberjack), [sentry-go](https://github.com/getsentry/sentry-go)
 
 ## Features
