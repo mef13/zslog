@@ -31,7 +31,7 @@ const (
 )
 
 type zlog struct {
-	zerolog.Logger
+	log             zerolog.Logger
 	closers         []io.Closer
 	noSentryWriters zerolog.LevelWriter
 }
@@ -124,6 +124,22 @@ func StdErr(l levels) zerolog.LevelWriter {
 }
 
 func InitLogger(writers ...zerolog.LevelWriter) {
+	logger = New(writers...)
+	zerolog.ErrorStackMarshaler = func(err error) interface{} {
+		es := errWithStackTrace{
+			Err: err.Error(),
+		}
+
+		if _, ok := err.(stackTracer); !ok {
+			err = errors.WithStack(err)
+		}
+
+		es.Stacktrace = sentry.ExtractStacktrace(err)
+		return &es
+	}
+}
+
+func New(writers ...zerolog.LevelWriter) zlog {
 	var closers []io.Closer
 	lwriters := zerolog.MultiLevelWriter()
 	slwriters := zerolog.MultiLevelWriter()
@@ -139,23 +155,12 @@ func InitLogger(writers ...zerolog.LevelWriter) {
 		}
 	}
 
-	logger = zlog{
-		Logger:          zerolog.New(lwriters).With().Timestamp().Logger(),
+	l := zlog{
+		log:             zerolog.New(lwriters).With().Timestamp().Logger(),
 		closers:         closers,
 		noSentryWriters: slwriters,
 	}
-	zerolog.ErrorStackMarshaler = func(err error) interface{} {
-		es := errWithStackTrace{
-			Err: err.Error(),
-		}
-
-		if _, ok := err.(stackTracer); !ok {
-			err = errors.WithStack(err)
-		}
-
-		es.Stacktrace = sentry.ExtractStacktrace(err)
-		return &es
-	}
+	return l
 }
 
 type stackTracer interface {
@@ -168,7 +173,29 @@ type errWithStackTrace struct {
 }
 
 func GetLogger() zerolog.Logger {
-	return logger.Logger
+	return logger.log
+}
+
+func (l *zlog) Trace() *zerolog.Event {
+	return l.log.Trace()
+}
+func (l *zlog) Debug() *zerolog.Event {
+	return l.log.Debug()
+}
+func (l *zlog) Info() *zerolog.Event {
+	return l.log.Info()
+}
+func (l *zlog) Warn() *zerolog.Event {
+	return l.log.Warn()
+}
+func (l *zlog) Error() *zerolog.Event {
+	return l.log.Error()
+}
+func (l *zlog) Fatal() *zerolog.Event {
+	return l.log.Fatal()
+}
+func (l *zlog) Panic() *zerolog.Event {
+	return l.log.Panic()
 }
 
 func Trace() *zerolog.Event {
@@ -200,6 +227,6 @@ func Close() {
 }
 
 func SkipSentry() *zerolog.Logger {
-	l := logger.Output(logger.noSentryWriters)
+	l := logger.log.Output(logger.noSentryWriters)
 	return &l
 }
