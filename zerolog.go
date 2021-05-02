@@ -32,7 +32,7 @@ const (
 
 type zlog struct {
 	zerolog.Logger
-	closers []io.Closer
+	closers         []io.Closer
 	noSentryWriters zerolog.LevelWriter
 }
 
