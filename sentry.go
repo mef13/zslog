@@ -3,7 +3,6 @@ package zslog
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"time"
 	"unsafe"
 
@@ -195,6 +194,7 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 }
 
 func bytesToStrUnsafe(data []byte) string {
-	h := (*reflect.SliceHeader)(unsafe.Pointer(&data))
-	return *(*string)(unsafe.Pointer(&reflect.StringHeader{Data: h.Data, Len: h.Len}))
+	//h := (*reflect.SliceHeader)(unsafe.Pointer(&data))
+	//return *(*string)(unsafe.Pointer(&reflect.StringHeader{Data: h.Data, Len: h.Len}))
+	return *(*string)(unsafe.Pointer(&data))
 }
