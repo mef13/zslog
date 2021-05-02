@@ -52,9 +52,7 @@ func NewLevels(lvls ...zerolog.Level) levels {
 			zerolog.PanicLevel}
 	}
 	var l []zerolog.Level
-	for _, lvl := range lvls {
-		l = append(l, lvl)
-	}
+	l = append(l, lvls...)
 	return l
 }
 
