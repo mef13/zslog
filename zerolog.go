@@ -122,6 +122,7 @@ func StdErr(l levels) zerolog.LevelWriter {
 }
 
 func InitLogger(writers ...zerolog.LevelWriter) {
+//TODO: return errors initialize writers
 	logger = New(writers...)
 	zerolog.ErrorStackMarshaler = func(err error) interface{} {
 		es := errWithStackTrace{
