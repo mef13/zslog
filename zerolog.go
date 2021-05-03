@@ -228,3 +228,7 @@ func SkipSentry() *zerolog.Logger {
 	l := logger.log.Output(logger.noSentryWriters)
 	return &l
 }
+
+func SetTimeFieldFormat(format string) {
+	zerolog.TimeFieldFormat = format
+}
