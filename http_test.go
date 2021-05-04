@@ -18,7 +18,7 @@ func TestHttpWriter(t *testing.T) {
 		if got, want := string(body), fmt.Sprintf("{\"level\":\"info\",\"time\":\"%s\",\"message\":\"msg\"}\n", time.Now().Format("2006")); got != want {
 			t.Errorf("\ngot:\n%s\nwant:\n%s", got, want)
 		}
-		w.Write([]byte(`OK`))
+		w.WriteHeader(200)
 	}))
 	log := New(&HttpWriter{
 		client: server.Client(),
