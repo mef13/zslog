@@ -219,10 +219,14 @@ func Panic() *zerolog.Event {
 	return logger.Panic()
 }
 
-func Close() {
-	for _, c := range logger.closers {
+func (l *zlog) Close() {
+	for _, c := range l.closers {
 		c.Close()
 	}
+}
+
+func Close() {
+	logger.Close()
 }
 
 func SkipSentry() *zerolog.Logger {
