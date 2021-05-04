@@ -90,6 +90,13 @@ type LevelWriter struct {
 	levels levels
 }
 
+func (lw *LevelWriter) Close() error {
+	if c, ok := lw.writer.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
+}
+
 func (lw *LevelWriter) WriteLevel(level zerolog.Level, p []byte) (n int, err error) {
 	if lw.levels.Contains(level) {
 		return lw.writer.Write(p)
@@ -122,7 +129,7 @@ func StdErr(l levels) zerolog.LevelWriter {
 }
 
 func InitLogger(writers ...zerolog.LevelWriter) {
-//TODO: return errors initialize writers
+	//TODO: return errors initialize writers
 	logger = New(writers...)
 	zerolog.ErrorStackMarshaler = func(err error) interface{} {
 		es := errWithStackTrace{
