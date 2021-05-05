@@ -30,6 +30,11 @@ const (
 	TraceLevel = zerolog.TraceLevel
 )
 
+var (
+	ErrInitWriter = errors.New("One or more LevelWriters is nil(error).")
+	PrintWritersError = true
+)
+
 type zlog struct {
 	log             zerolog.Logger
 	closers         []io.Closer
@@ -137,6 +142,7 @@ func InitLogger(writers ...zerolog.LevelWriter) error {
 func New(writers ...zerolog.LevelWriter) (zlog, error) {
 	//TODO: return errors initialize writers
 	var closers []io.Closer
+	var err error
 	lwriters := zerolog.MultiLevelWriter()
 	slwriters := zerolog.MultiLevelWriter()
 	for _, w := range writers {
@@ -148,6 +154,8 @@ func New(writers ...zerolog.LevelWriter) (zlog, error) {
 			if _, ok := w.(*SentryWriter); !ok {
 				slwriters = zerolog.MultiLevelWriter(slwriters, w)
 			}
+		} else {
+			err = ErrInitWriter
 		}
 	}
 	l := zlog{
@@ -169,7 +177,7 @@ func New(writers ...zerolog.LevelWriter) (zlog, error) {
 		return &es
 	}
 	
-	return l, nil
+	return l, err
 }
 
 type stackTracer interface {
