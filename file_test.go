@@ -10,7 +10,10 @@ import (
 
 func TestFileWriter(t *testing.T) {
 	filePath := filepath.Join(t.TempDir(), "testFile")
-	log := New(File(filePath, FileConfig{}, NewLevels()))
+	log, err := New(File(filePath, FileConfig{}, NewLevels()))
+	if err != nil {
+		t.Fatal(err)
+	}
 	SetTimeFieldFormat("2006")
 	log.Trace().Msg("msg")
 	log.Close()

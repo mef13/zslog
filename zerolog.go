@@ -128,24 +128,14 @@ func StdErr(l levels) zerolog.LevelWriter {
 	return lw
 }
 
-func InitLogger(writers ...zerolog.LevelWriter) {
-	//TODO: return errors initialize writers
-	logger = New(writers...)
-	zerolog.ErrorStackMarshaler = func(err error) interface{} {
-		es := errWithStackTrace{
-			Err: err.Error(),
-		}
-
-		if _, ok := err.(stackTracer); !ok {
-			err = errors.WithStack(err)
-		}
-
-		es.Stacktrace = sentry.ExtractStacktrace(err)
-		return &es
-	}
+func InitLogger(writers ...zerolog.LevelWriter) error {
+	l, err := New(writers...)
+	logger = l
+	return err
 }
 
-func New(writers ...zerolog.LevelWriter) zlog {
+func New(writers ...zerolog.LevelWriter) (zlog, error) {
+	//TODO: return errors initialize writers
 	var closers []io.Closer
 	lwriters := zerolog.MultiLevelWriter()
 	slwriters := zerolog.MultiLevelWriter()
@@ -160,13 +150,26 @@ func New(writers ...zerolog.LevelWriter) zlog {
 			}
 		}
 	}
-
 	l := zlog{
 		log:             zerolog.New(lwriters).With().Timestamp().Logger(),
 		closers:         closers,
 		noSentryWriters: slwriters,
 	}
-	return l
+
+	zerolog.ErrorStackMarshaler = func(err error) interface{} {
+		es := errWithStackTrace{
+			Err: err.Error(),
+		}
+
+		if _, ok := err.(stackTracer); !ok {
+			err = errors.WithStack(err)
+		}
+
+		es.Stacktrace = sentry.ExtractStacktrace(err)
+		return &es
+	}
+	
+	return l, nil
 }
 
 type stackTracer interface {

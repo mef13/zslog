@@ -20,7 +20,10 @@ func TestHttpWriter(t *testing.T) {
 		}
 		w.WriteHeader(200)
 	}))
-	log := New(GetHttpWriter("POST", server.URL, NewLevels()))
+	log, err := New(GetHttpWriter("POST", server.URL, NewLevels()))
+	if err != nil {
+		t.Fatal(err)
+	}
 	SetTimeFieldFormat("2006")
 	defer server.Close()
 	log.Info().Msg("msg")

@@ -16,7 +16,10 @@ import (
 func TestConsoleLogger(t *testing.T) {
 	t.Run("Numbers", func(t *testing.T) {
 		buf := &bytes.Buffer{}
-		log := New(&LevelWriter{writer: zerolog.ConsoleWriter{Out: buf, NoColor: true, TimeFormat: "2006"}, levels: NewLevels()})
+		log, err := New(&LevelWriter{writer: zerolog.ConsoleWriter{Out: buf, NoColor: true, TimeFormat: "2006"}, levels: NewLevels()})
+		if err != nil {
+			t.Fatal(err)
+		}
 		log.Info().
 			Float64("float", 1.23).
 			Uint64("small", 123).
@@ -31,7 +34,10 @@ func TestConsoleLogger(t *testing.T) {
 //TODO: test sentry stacktrace
 func TestSentry(t *testing.T) {
 	transport := &TransportMock{}
-	log := New(Sentry(SentryConfig{Transport: transport}, time.Second, NewLevels()))
+	log, err := New(Sentry(SentryConfig{Transport: transport}, time.Second, NewLevels()))
+	if err != nil {
+		t.Fatal(err)
+	}
 	log.Debug().Str("s", "test").Int("i", 9).Msg("msg")
 	if transport.lastEvent == nil {
 		t.Fatal("Sentry not capture event")
