@@ -43,6 +43,9 @@ func GetHttpWriter(method string, endpoint string, l levels) zerolog.LevelWriter
 	if err != nil {
 		return nil
 	}
+	if u.Host == "" {
+		return nil
+	}
 	h := &HttpWriter{
 		client: &http.Client{
 			Transport: &http.Transport{
