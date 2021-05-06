@@ -41,9 +41,11 @@ func (hw *HttpWriter) Write(p []byte) (n int, err error) {
 func GetHttpWriter(method string, endpoint string, l levels) zerolog.LevelWriter {
 	u, err := url.Parse(endpoint)
 	if err != nil {
+		PrintWriterError("HttpWriter: error parse url: %v\n", err)
 		return nil
 	}
 	if u.Host == "" {
+		PrintWriterError("HttpWriter: invalid url \"%s\"\n", endpoint)
 		return nil
 	}
 	h := &HttpWriter{

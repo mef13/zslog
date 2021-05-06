@@ -1,6 +1,7 @@
 package zslog
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -31,9 +32,25 @@ const (
 )
 
 var (
-	ErrInitWriter = errors.New("One or more LevelWriters is nil(error).")
-	PrintWritersError = true
+	ErrInitWriter              = errors.New("One or more LevelWriters is nil(error).")
+	WriterErrorLog WriterError = defaultWriterError{}
 )
+
+type WriterError interface {
+	Print(format string, a ...interface{})
+}
+
+type defaultWriterError struct{}
+
+func (d defaultWriterError) Print(format string, a ...interface{}) {
+	fmt.Fprintf(os.Stderr, format, a...)
+}
+
+func PrintWriterError(format string, a ...interface{}) {
+	if WriterErrorLog != nil {
+		WriterErrorLog.Print(format, a...)
+	}
+}
 
 type zlog struct {
 	log             zerolog.Logger
@@ -140,7 +157,6 @@ func InitLogger(writers ...zerolog.LevelWriter) error {
 }
 
 func New(writers ...zerolog.LevelWriter) (zlog, error) {
-	//TODO: return errors initialize writers
 	var closers []io.Closer
 	var err error
 	lwriters := zerolog.MultiLevelWriter()
@@ -176,7 +192,7 @@ func New(writers ...zerolog.LevelWriter) (zlog, error) {
 		es.Stacktrace = sentry.ExtractStacktrace(err)
 		return &es
 	}
-	
+
 	return l, err
 }
 

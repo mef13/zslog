@@ -28,8 +28,11 @@ func TestHttpWriter(t *testing.T) {
 	SetTimeFieldFormat("2006")
 	log.Info().Msg("msg")
 
-	t.Run("Nil writer", func(t *testing.T) {
-		log, err = New(GetHttpWriter("POST", server.URL, NewLevels()), GetHttpWriter("POST", "1", NewLevels()))
+	t.Run("Invalid endpoint", func(t *testing.T) {
+		WriterErrorLog = nil
+		log, err = New(GetHttpWriter("POST", server.URL, NewLevels()),
+			GetHttpWriter("POST", "1", NewLevels()),
+			GetHttpWriter("POST", ":", NewLevels()))
 		if err == nil {
 			t.Error("an error was expected, but it did not appear")
 		} else {
