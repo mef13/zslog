@@ -27,3 +27,20 @@ func TestConsoleLogger(t *testing.T) {
 		}
 	})
 }
+
+func TestLevels(t *testing.T) {
+	l := NewLevels(WarnLevel)
+	if len(l) != 1 {
+		t.Error("NewLevel return incorrect levels count")
+	}
+	if l[0] != WarnLevel {
+		t.Errorf("got:%v, want:%v", l[0], WarnLevel)
+	}
+	l = l.SetMinLevel(ErrorLevel)
+	if len(l) != 0 {
+		t.Error("SetMinLevel return incorrect levels count")
+	}
+	if l.Contains(WarnLevel) {
+		t.Error("SetMinLevel work incorrect")
+	}
+}
