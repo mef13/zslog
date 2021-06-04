@@ -7,7 +7,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/mef13/zslog)](https://app.codecov.io/gh/mef13/zslog)
 ![GitHub](https://img.shields.io/github/license/mef13/zslog)
 
-Simply configuring [zerolog](https://github.com/rs/zerolog) with output to console, [lumberjack.v2](https://github.com/natefinch/lumberjack), [sentry-go](https://github.com/getsentry/sentry-go)
+Simply configuring [zerolog](https://github.com/rs/zerolog) with output to console, [lumberjack.v2](https://github.com/natefinch/lumberjack), [sentry-go](https://github.com/getsentry/sentry-go), http.
 
 ## Features
 
