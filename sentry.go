@@ -81,8 +81,8 @@ func getSentryWriterFromConf(sentryConf SentryConfig, flushTimeout time.Duration
 	return getSentryWriter(client, flushTimeout, lvls)
 }
 
-//Sentry creates and return zerolog.LevelWriter interface.
-//Configured by SentryConfig(heir sentry.ClientOptions).
+// Sentry creates and return zerolog.LevelWriter interface.
+// Configured by SentryConfig(heir sentry.ClientOptions).
 func Sentry(sentryConf SentryConfig, flushTimeout time.Duration, lvls levels) zerolog.LevelWriter {
 	w, _ := getSentryWriterFromConf(sentryConf, flushTimeout, lvls)
 	return w
@@ -93,8 +93,8 @@ func SentryFromClient(sentryClient *sentry.Client, flushTimeout time.Duration, l
 	return w
 }
 
-//SentryWithHub creates and return zerolog.LevelWriter interface.
-//Unlike Sentry() it also adds a sentry.Client to the sentry.Hub(like sentry.Init).
+// SentryWithHub creates and return zerolog.LevelWriter interface.
+// Unlike Sentry() it also adds a sentry.Client to the sentry.Hub(like sentry.Init).
 func SentryWithHub(sentryConf SentryConfig, flushTimeout time.Duration, lvls levels) zerolog.LevelWriter {
 	w, err := getSentryWriterFromConf(sentryConf, flushTimeout, lvls)
 	if err != nil {
@@ -136,12 +136,12 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 		Timestamp: time.Now().UTC(),
 		Level:     level,
 		Logger:    "github.com/rs/zerolog",
-		Contexts:  make(map[string]interface{}),
+		Contexts:  make(map[string]sentry.Context),
 	}
 
 	isStack := false
 	var errExept sentry.Exception
-	payload := make(map[string]string)
+	payload := make(sentry.Context)
 
 	err := jsonparser.ObjectEach(data, func(key, value []byte, vt jsonparser.ValueType, offset int) error {
 		switch string(key) {
@@ -161,7 +161,7 @@ func (sw *SentryWriter) parseEvent(data []byte, level sentry.Level) (*sentry.Eve
 				e := sentry.Event{
 					Timestamp: time.Now().UTC(),
 					Level:     sentry.LevelError,
-					Contexts:  make(map[string]interface{}),
+					Contexts:  make(map[string]sentry.Context),
 				}
 				e.Exception = append(event.Exception, sentry.Exception{
 					Value:      err.Error(),

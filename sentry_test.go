@@ -1,7 +1,6 @@
 package zslog
 
 import (
-	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -9,7 +8,7 @@ import (
 	"github.com/getsentry/sentry-go"
 )
 
-//TODO: test sentry stacktrace
+// TODO: test sentry stacktrace
 func TestSentry(t *testing.T) {
 	transport := &TransportMock{}
 	log, err := New(Sentry(SentryConfig{Transport: transport}, time.Second, NewLevels()))
@@ -35,15 +34,11 @@ func TestSentry(t *testing.T) {
 		if !ok {
 			t.Fatal("Payload not found")
 		}
-		p, ok:=payload.(map[string]string)
-		if !ok {
-			t.Fatalf("Invalid payload structure: %s", reflect.ValueOf(payload).Type().String())
+		if payload["s"] != "test" {
+			t.Errorf("Sentry want 'test' in 's' payload, but get '%s'", payload["s"])
 		}
-		if p["s"] != "test" {
-			t.Errorf("Sentry want 'test' in 's' payload, but get '%s'", p["s"])
-		}
-		if p["i"] != "9" {
-			t.Errorf("Sentry want '9' in 'i' payload, but get '%s'", p["i"])
+		if payload["i"] != "9" {
+			t.Errorf("Sentry want '9' in 'i' payload, but get '%s'", payload["i"])
 		}
 	})
 }
