@@ -159,25 +159,25 @@ func InitLogger(writers ...zerolog.LevelWriter) error {
 func New(writers ...zerolog.LevelWriter) (zlog, error) {
 	var closers []io.Closer
 	var err error
-	lwriters := zerolog.MultiLevelWriter()
-	slwriters := zerolog.MultiLevelWriter()
+	lwriters := make([]io.Writer, 0, len(writers))
+	slwriters := make([]io.Writer, 0, len(writers))
 	for _, w := range writers {
 		if w != nil {
-			lwriters = zerolog.MultiLevelWriter(lwriters, w)
+			lwriters = append(lwriters, w)
 			if c, ok := w.(io.Closer); ok {
 				closers = append(closers, c)
 			}
 			if _, ok := w.(*SentryWriter); !ok {
-				slwriters = zerolog.MultiLevelWriter(slwriters, w)
+				slwriters = append(slwriters, w)
 			}
 		} else {
 			err = ErrInitWriter
 		}
 	}
 	l := zlog{
-		log:             zerolog.New(lwriters).With().Timestamp().Logger(),
+		log:             zerolog.New(zerolog.MultiLevelWriter(lwriters...)).With().Timestamp().Logger(),
 		closers:         closers,
-		noSentryWriters: slwriters,
+		noSentryWriters: zerolog.MultiLevelWriter(slwriters...),
 	}
 
 	zerolog.ErrorStackMarshaler = func(err error) interface{} {
